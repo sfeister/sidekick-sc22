@@ -1,0 +1,133 @@
+record(stringin,"LEDS:info"){
+    field (DESC, "Get information about the LED device")
+	field(DTYP,"stream")
+	field(INP,"@leds.proto info led_ino")
+    field(PINI, "YES")
+}
+
+
+# Channel 0
+record(longout,"LEDS:CH0:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(0) led_ino")
+}
+
+record(int64out,"LEDS:CH0:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(0) led_ino")
+}
+
+
+# Channel 1
+record(longout,"LEDS:CH1:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(1) led_ino")
+}
+
+record(int64out,"LEDS:CH1:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(1) led_ino")
+}
+
+
+
+# Channel 2
+record(longout,"LEDS:CH2:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(2) led_ino")
+}
+
+record(int64out,"LEDS:CH2:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(2) led_ino")
+}
+
+
+# Channel 3
+record(longout,"LEDS:CH3:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(3) led_ino")
+}
+
+record(int64out,"LEDS:CH3:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(3) led_ino")
+}
+
+
+
+
+
+# Channel 4
+record(longout,"LEDS:CH4:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(4) led_ino")
+}
+
+record(int64out,"LEDS:CH4:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(4) led_ino")
+}
+
+
+
+
+# Channel 5
+record(longout,"LEDS:CH5:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(5) led_ino")
+}
+
+record(int64out,"LEDS:CH5:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(5) led_ino")
+}
+
+
+
+record(stringin,"LEDS:debug"){
+	field(DTYP,"stream")
+	field(INP,"@leds.proto debug led_ino")
+}
