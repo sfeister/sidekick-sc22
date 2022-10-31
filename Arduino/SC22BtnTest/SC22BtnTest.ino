@@ -33,7 +33,7 @@ void setup() {
 
 void loop() {
   for(int i = 0; i < NBTNS; i++) {
-    sprintf(buffer, "B%d: %d", i, counts[i]);
+    sprintf(buffer, "ROT%d: %d", i, counts[i]);
     Serial.println(buffer);
     counts[i]++;
   }

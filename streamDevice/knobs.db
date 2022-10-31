@@ -1,0 +1,27 @@
+record(stringin,"KNOBS:info"){
+    field (DESC, "Get information about the knobs")
+	field(DTYP,"stream")
+	field(INP,"@knobs.proto info knobs_ino")
+    field(PINI, "YES")
+}
+
+record(longin,"KNOBS:ROT0:count"){
+    field (DESC, "Get knob #0 rotary count")
+	field(DTYP,"stream")
+    field(SCAN,"I/O Intr")
+	field(INP,"@knobs.proto count0 knobs_ino")
+    field(PINI, "NO")
+}
+
+record(longin,"KNOBS:ROT1:count"){
+    field (DESC, "Get knob #1 rotary count")
+	field(DTYP,"stream")
+    field(SCAN,"I/O Intr")
+	field(INP,"@knobs.proto count1 knobs_ino")
+    field(PINI, "NO")
+}
+
+record(stringin,"KNOBS:debug"){
+	field(DTYP,"stream")
+	field(INP,"@knobs.proto debug knobs_ino")
+}
