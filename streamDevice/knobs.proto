@@ -20,6 +20,21 @@ count1 {
 	in "ROT1: %d";
 }
 
+count2 {
+	ExtraInput = Ignore;
+	in "ROT2: %d";
+}
+
+count3 {
+	ExtraInput = Ignore;
+	in "ROT3: %d";
+}
+
+count4 {
+	ExtraInput = Ignore;
+	in "ROT4: %d";
+}
+
 debug {
    ExtraInput = Ignore;
    out "%s";
