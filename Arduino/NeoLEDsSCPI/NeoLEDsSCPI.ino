@@ -92,7 +92,7 @@ void myISR() {
 
 /* Serial communication functions */
 void identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,v0.1"));
+  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,20221109"));
 }
 
 void getBrightness(SCPI_C commands, SCPI_P parameters, Stream& interface) {
