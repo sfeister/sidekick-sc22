@@ -104,29 +104,6 @@ record(int64out,"LEDS:CH4:dur"){
 	field(OUT,"@leds.proto setDuration(4) led_ino")
 }
 
-
-
-
-# Channel 5
-record(longout,"LEDS:CH5:brig"){
-    field (DESC, "Set LED brightness")
-	field(DTYP,"stream")
-	field(DRVL,"0")
-	field(DRVH,"255")  
-	field(OUT,"@leds.proto setBrightness(5) led_ino")
-}
-
-record(int64out,"LEDS:CH5:dur"){
-    field(DESC, "Set LED duration (output)")
-	field(DTYP,"stream")
-	field(DRVL,"0")
-	field(DRVH,"10000000") # restrict users from setting overly high times
-	field(EGU,"micros")
-	field(OUT,"@leds.proto setDuration(5) led_ino")
-}
-
-
-
 record(stringin,"LEDS:debug"){
 	field(DTYP,"stream")
 	field(INP,"@leds.proto debug led_ino")
