@@ -1,12 +1,14 @@
 /*
-LEDsSCPI.ino
+NeoLEDsSCPI.ino
 
 When externally triggered, flashes six LEDs a single time. Each LED has its own flash duration and brightness.
+
+Built directly off of LEDsSCPI.ino from the Sidekick system. Adapted for use with Adafruit Neopixels.
 
 Important Notes:
  * LED flash begins abbout 1000 microseconds after the external trigger is received.
  * External trigger should be wired to Arduino Pin 2.
- * The six LED outputs should be wired to Arduino Pins 3, 5, 6, 9, 10, and 11.
+ * The Neopixel data pin should be wired to Arduino Pin 3.
  
 Serial Commands (lower-case portions are optional):
   *IDN?                 Responds with a device identification string.
@@ -14,38 +16,39 @@ Serial Commands (lower-case portions are optional):
   DURation:LEDN?        Responds with LED N (0-5) pulse duration (unsigned long integer, in microseconds).
   BRIGhtness:LEDN VAL   Sets LED N (0-5) brightness (PWM duty cycle) to VAL (integer, 0 to 255).
   BRIGhtness:LEDN?      Responds with LED N (0-5) brightness (PWM duty cycle)(integer, 0 to 255).
-  
+ 
 References:
  1. Following timer instructions at: https://github.com/contrem/arduino-timer
  2. Following Vrekrer SCPI Parser examples, e.g. at https://github.com/Vrekrer/Vrekrer_scpi_parser/blob/master/examples/Numeric_suffixes/Numeric_suffixes.ino
  3. Attaching an interrupt pin for external triggering: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/ 
 
-Created by Keily Valdez-Sereno, Emiko Ito, and Scott Feister of California State University Channel Islands in Summer/Fall 2021.
-
-Modified for Supercomputing Conference 2022 (SC22) Demo October 2022.
+Created by Emiko Ito, Keily Valdez-Sereno, and Scott Feister of California State University Channel Islands between 2021 - 2022.
 */
 
 #include "Arduino.h" 
 #include <arduino-timer.h>
 #include "Vrekrer_scpi_parser.h"
-
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
 
 
 #define EXTTRIG 2 // Note that this pin must be one of the Arduino pins capable of digital interrupt. See table at https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
 
-// Note that LEDs must be assigned to PWM-capable digital output pins
-#define NLED 6 // Total number of LED outputs, each with independent duration and PWM brightness 
-#define LED0 3
-#define LED1 5
-#define LED2 6
-#define LED3 9
-#define LED4 10
-#define LED5 11
+#define NLED 5 // Total number of Neopixels in the strand, each with independent duration and brightness 
+#define LED0 3  //this is the data pin we will use for the neopixel strand
+
+Adafruit_NeoPixel pixels(NLED, LED0, NEO_RGBW + NEO_KHZ800);
+
 
 Timer<16, micros, int> timer1; // Timer with 16 task slots, microsecond resolution, and handler argument type int
 
 int LEDPins[NLED]; // Arduino pin numbers for each of the six LED outputs
 int brights[NLED]; // Brightnesses for each of the six LEDs, when on
+float red[NLED] =   {1, 0, 0, 1, 0}; //red values for each pixel
+float green[NLED] = {0, 1, 0, 0, 1};; //green values for each pixel
+float blue[NLED] =  {0, 0, 1, 1, 1};; //blue values for each pixel
 unsigned long durations[NLED]; // Pulse duration times, in microseconds, for each of the six LEDs
 unsigned long t0;
 
@@ -55,14 +58,17 @@ int value = 0; // temp variable
 
 /* LED control functions */
 bool LEDStart(int LEDid) {
-    // Turn on the LED of this index (0-5), with a specified PWM brightness
-    analogWrite(LEDPins[LEDid], brights[LEDid]);
+    // Turn on the LED of this index (0-5), with a specified brightness
+    pixels.setPixelColor(LEDid, pixels.Color(brights[LEDid] * red[LEDid], brights[LEDid] * green[LEDid], brights[LEDid] * blue[LEDid]));
+    pixels.show();
     return false; // to repeat the action - false to stop
 }
 
 bool LEDStop(int LEDid) {
     // Turn off the LED of this index (0-5)
-    digitalWrite(LEDPins[LEDid], LOW);
+    //just sets whatever pixel to all 0s so it's nothing
+    pixels.setPixelColor(LEDid, pixels.Color(0, 0, 0, 0)); //set first pixel to color RED
+    pixels.show();
     return false; // to repeat the action - false to stop
 }
 
@@ -86,7 +92,7 @@ void myISR() {
 
 /* Serial communication functions */
 void identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  interface.println(F("DolphinDAQ,SC22 LEDs,#00,v0.1"));
+  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,v0.1"));
 }
 
 void getBrightness(SCPI_C commands, SCPI_P parameters, Stream& interface) {
@@ -115,6 +121,7 @@ void setBrightness(SCPI_C commands, SCPI_P parameters, Stream& interface) {
     if(parameters.Size() > 0) {
       value = String(parameters[0]).toInt();
       brights[suffix] = constrain(value, 0, 255);
+      //set brightness value in array, then we're gucc
     }
   }
 }
@@ -157,35 +164,15 @@ void setup() {
   my_instrument.SetCommandTreeBase(F("DURation:"));
   my_instrument.RegisterCommand(F("LED#?"), &getDuration);
   my_instrument.RegisterCommand(F("LED#"), &setDuration);
-  
-  pinMode(LED0, OUTPUT);
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-  pinMode(LED5, OUTPUT);
-  digitalWrite(LED0, LOW); 
-  digitalWrite(LED1, LOW);
-  digitalWrite(LED2, LOW);
-  digitalWrite(LED3, LOW);
-  digitalWrite(LED4, LOW);
-  digitalWrite(LED5, LOW);
 
-  // Save pin numbers into the chanPins array
-  LEDPins[0] = LED0;
-  LEDPins[1] = LED1;
-  LEDPins[2] = LED2;
-  LEDPins[3] = LED3;
-  LEDPins[4] = LED4;
-  LEDPins[5] = LED5;
     
   // Set initial LED pulse durations (in microseconds)
-  durations[0] = 200000;
+  durations[0] = 500000;
   durations[1] = 500000;
-  durations[2] = 150000;
-  durations[3] = 400000;
-  durations[4] = 350000;
-  durations[5] = 100000;
+  durations[2] = 500000;
+  durations[3] = 500000;
+  durations[4] = 500000;
+  durations[5] = 500000;
 
   // Set intial LED brightnesses
   brights[0] = 200;
@@ -198,8 +185,13 @@ void setup() {
   // Set up external triggering
   attachInterrupt(digitalPinToInterrupt(EXTTRIG), myISR, RISING);
 
+  //Initialize Neopixel strand
+  pixels.begin();
+  pixels.show();
+  pixels.clear();
+
   // Begin accepting SCPI commands
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop() {
