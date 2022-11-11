@@ -5,7 +5,7 @@ streamApp_registerRecordDeviceDriver
 
 epicsEnvSet "STREAM_PROTOCOL_PATH","."
 
-drvAsynSerialPortConfigure("knobs_ino","/dev/ttyUSB0")
+drvAsynSerialPortConfigure("knobs_ino","/dev/ttyUSB1")
 asynSetOption("knobs_ino",0,"baud","115200")
 asynSetOption("knobs_ino",0,"bits","8")
 asynSetOption("knobs_ino",0,"parity","none")
