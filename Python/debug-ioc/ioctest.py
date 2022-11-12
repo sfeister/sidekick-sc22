@@ -11,6 +11,7 @@ if __name__ == "__main__":
     builder.SetDeviceName("CAM")
 
     ## Create some records
+    cam_info = builder.stringIn("INFO", initial_value="DolphinDAQ,PiCamera2,#00,20221112-5AM")
 
     # Run contols
     cam_enable = builder.boolOut("ENABLE", ZNAM="false", ONAM="true")
