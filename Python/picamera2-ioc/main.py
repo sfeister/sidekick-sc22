@@ -58,15 +58,24 @@ if __name__ == "__main__":
     softioc.iocInit()
 
     ### INITIALIZE CAMERA
+    print("Starting the camera.")
+    cam_starting.set(1)
     picam2 = Picamera2()
     camera_config = picam2.create_video_configuration()
     picam2.configure(camera_config)
+    print("CAMERA CONFIGURATION:")
+    print(camera_config)
     picam2.start()
+    cam_starting.set(0)
+    cam_running.set(1)
 
     trigcnt = 1828398
 
     while True:
         ## CAPTURE A SINGLE IMAGE (todo: move this into a callback)
+        
+        # TODO: Await a new trigger here
+        # TODO: Exposure issues?
         
         trigcnt += 1
         
@@ -95,6 +104,20 @@ if __name__ == "__main__":
         roi2_data.set(datastr2)
         print(datastr1)
         #print(datastr2)
+        
+        if cam_debug.get():
+            print("Saving photo for trigger {}".format(trigcnt))
+            # Save photo
+            im.save('/home/pi/images/{}-photo.png'.format(trigcnt))
+
+            # Save graphic patched over with ROI rectangles
+            fig, ax = plt.subplots()
+            ax.imshow(imarr)
+            ax.add_patch(rect1)
+            ax.add_patch(rect2)
+            fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt))
+            fig.clear()
+
         sleep(1)
     
     #sleep(20)
