@@ -96,12 +96,12 @@ void myISR() {
           timer1.at(t0 + durations[i], LEDStop, i); // Set the stop time for this LED (must be significantly after the start time)
       }
     }
-    //String triggerMsg = "TRIG: " + trigCount;
-    //Serial.print("TRIG: " + String(trigCount) + ", ");
-    //for (int i = 0; i < NLED; i++){
-      //Serial.print("L" + String(i) + ": " + String(brights[i]) + ", ");
-    //}    
-    //Serial.println();
+    String triggerMsg = "TRIG: " + trigCount;
+    Serial.print("TRIG: " + String(trigCount) + ", ");
+    for (int i = 0; i < NLED; i++){
+      Serial.print("L" + String(i) + ": " + String(brights[i]) + ", ");
+    }    
+    Serial.println();
 }
 
 /* Serial communication functions */
