@@ -1,6 +1,9 @@
 #!/bin/python3
 
+# An untested effort to tie everything together
+
 from picamera2 import Picamera2, Preview
+from picamera2.controls import Controls
 import time
 from time import sleep
 from PIL import Image
@@ -8,10 +11,29 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+import RPi.GPIO as GPIO
+import signal
+import sys
+
 from softioc import softioc, builder
 import cothread
 import logging
 
+trigcnt = 0
+capture = False
+exp_us = 10000 # initial exposure
+
+def signal_handler(sig, frame):
+    GPIO.cleanup()
+    sys.exit(0)
+
+def exti_callback(channel):
+    # When trigger arrives, increment triger count and request image capture
+    global trigcnt, capture
+    trigcnt += 1
+    if not capture:
+        capture = True
+        
 def getbox(x, y, rad=50):
     """ Gets a matplotlib patch and a PIL-style crop box from x,y center coordinates and an optional half-diameter"""
     xycent = np.array([x, y])
@@ -42,7 +64,9 @@ if __name__ == "__main__":
     cam_running = builder.boolIn("RUNNING", ZNAM="false", ONAM="true")
     cam_stopping = builder.boolIn("STOPPING", ZNAM="false", ONAM="true")
 
-        # Format e.g. "TRIG:412302132,R:25,G:205,B:111"
+    cam_exposure = builder.longOut("EXPOSURE", initial_value=exp_us)
+    
+            # Format e.g. "TRIG:412302132,R:25,G:205,B:111"
     roi1_data = builder.stringIn("ROI1:DATA", initial_value="")
     roi1_x = builder.longOut("ROI1:X", initial_value=310)
     roi1_y = builder.longOut("ROI1:Y", initial_value=410)
@@ -61,66 +85,92 @@ if __name__ == "__main__":
     print("Starting the camera.")
     cam_starting.set(1)
     picam2 = Picamera2()
+    picam2.start_preview(Preview.QTGL)
     camera_config = picam2.create_video_configuration()
     picam2.configure(camera_config)
     print("CAMERA CONFIGURATION:")
     print(camera_config)
     picam2.start()
+    
+    # Adjust exposure time
+    ctrls = Controls(picam2)
+    ctrls.AnalogueGain = 1.0
+    ctrls.ExposureTime = cam_exposure.get() #microseconds
+    picam2.set_controls(ctrls)
+    
     cam_starting.set(0)
     cam_running.set(1)
 
-    trigcnt = 1828398
-
-    while True:
-        ## CAPTURE A SINGLE IMAGE (todo: move this into a callback)
-        
-        # TODO: Await a new trigger here
-        # TODO: Exposure issues?
-        
-        trigcnt += 1
-        
-        im = picam2.capture_image("main")
-        imarr = np.array(im)
-
-        # Hard code positions of rectangles here!
-        #box1, rect1 = getbox(x=309, y=438, rad=10);
-        #box2, rect2 = getbox(x=990, y=389, rad=10);
-        box1, rect1 = getbox(x=roi1_x.get(), y=roi1_y.get(), rad=roi1_rad.get());
-        box2, rect2 = getbox(x=roi2_x.get(), y=roi2_y.get(), rad=roi2_rad.get());
-        #print(box1)
-
-        im1 = im.crop(box=box1)
-        im1_arr = np.array(im1)[:,:,:3] # Note, remove transparency channel here
-        avg1 = im1_arr.mean(axis=(0,1))
-        avg1_u8 = np.round(avg1).astype(np.uint8)
-        datastr1 = "TRIG:{},R:{},G:{},B:{}".format(trigcnt,avg1_u8[0],avg1_u8[1],avg1_u8[2])
-        roi1_data.set(datastr1)
-
-        im2 = im.crop(box=box2)
-        im2_arr = np.array(im2)[:,:,:3] # Note, remove transparency channel here
-        avg2 = im2_arr.mean(axis=(0,1))
-        avg2_u8 = np.round(avg2).astype(np.uint8)
-        datastr2 = "TRIG:{},R:{},G:{},B:{}".format(trigcnt,avg2_u8[0],avg2_u8[1],avg2_u8[2])
-        roi2_data.set(datastr2)
-        print(datastr1)
-        #print(datastr2)
-        
-        if cam_debug.get():
-            print("Saving photo for trigger {}".format(trigcnt))
-            # Save photo
-            im.save('/home/pi/images/{}-photo.png'.format(trigcnt))
-
-            # Save graphic patched over with ROI rectangles
-            fig, ax = plt.subplots()
-            ax.imshow(imarr)
-            ax.add_patch(rect1)
-            ax.add_patch(rect2)
-            fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt))
-            fig.clear()
-
-        sleep(1)
+    #### Initialize GPIO interrupt
+    EXTI_GPIO = 16
     
-    #sleep(20)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(EXTI_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(EXTI_GPIO, GPIO.RISING, 
+        callback=exti_callback, bouncetime=200)
+    
+    signal.signal(signal.SIGINT, signal_handler) # Catch Ctrl+c for cleanup
+    
+    trigcnt = 0
+    
+    while True:                
+        if capture:
+            ## CAPTURE A SINGLE IMAGE
+            trigcnt_im = trigcnt
+            im = picam2.capture_image("main")
+            imarr = np.array(im)
+
+            # Hard code positions of rectangles here!
+            #box1, rect1 = getbox(x=309, y=438, rad=10);
+            #box2, rect2 = getbox(x=990, y=389, rad=10);
+            box1, rect1 = getbox(x=roi1_x.get(), y=roi1_y.get(), rad=roi1_rad.get());
+            box2, rect2 = getbox(x=roi2_x.get(), y=roi2_y.get(), rad=roi2_rad.get());
+            #print(box1)
+
+            im1 = im.crop(box=box1)
+            im1_arr = np.array(im1)[:,:,:3] # Note, remove transparency channel here
+            avg1 = im1_arr.mean(axis=(0,1))
+            avg1_u8 = np.round(avg1).astype(np.uint8)
+            datastr1 = "TRIG:{},R:{},G:{},B:{}".format(trigcnt_im,avg1_u8[0],avg1_u8[1],avg1_u8[2])
+            roi1_data.set(datastr1)
+
+            im2 = im.crop(box=box2)
+            im2_arr = np.array(im2)[:,:,:3] # Note, remove transparency channel here
+            avg2 = im2_arr.mean(axis=(0,1))
+            avg2_u8 = np.round(avg2).astype(np.uint8)
+            datastr2 = "TRIG:{},R:{},G:{},B:{}".format(trigcnt_im,avg2_u8[0],avg2_u8[1],avg2_u8[2])
+            roi2_data.set(datastr2)
+            print(datastr1)
+            #print(datastr2)
+            
+            if cam_debug.get():
+                print("Saving photo for trigger {}".format(trigcnt_im))
+                # Save photo
+                
+                im.save('/home/pi/images/{}-photo.png'.format(trigcnt_im))
+
+                # Save graphic patched over with ROI rectangles
+                fig, ax = plt.subplots()
+                ax.imshow(imarr)
+                ax.add_patch(rect1)
+                ax.add_patch(rect2)
+                fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt_im))
+                plt.draw() # Hopefully, doesn't crash
+                plt.pause(0.005)
+                fig.clear()
+                plt.close('all')
+    
+            capture = False
+        elif cam_exposure.get() != exp_us:
+            # Adjust exposure time
+            ctrls = Controls(picam2)
+            exp_us = cam_exposure.get() 
+            ctrls.ExposureTime = exp_us #microseconds
+            picam2.set_controls(ctrls)
+            print("Exposure updated to {} us".format(exp_us))
+        else:
+            sleep(0.01)
+    
     # Finally leave the IOC running with an interactive shell.
     #softioc.interactive_ioc(globals())
     cothread.WaitForQuit()

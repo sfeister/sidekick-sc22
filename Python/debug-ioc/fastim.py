@@ -35,8 +35,8 @@ if __name__ == "__main__":
     #imarr = picam2.capture_array("main")
 
     # Hard code positions of rectangles here!
-    box1, rect1 = getbox(x=309, y=438, rad=10);
-    box2, rect2 = getbox(x=990, y=389, rad=10);
+    box1, rect1 = getbox(x=446, y=366, rad=10);
+    box2, rect2 = getbox(x=957, y=397, rad=10);
 
     im1 = im.crop(box=box1)
     im1_arr = np.array(im1)[:,:,:3] # Note, remove transparency channel here
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print(avg1_u8)
     print(avg2_u8)
 
-    debug = False;
+    debug = True;
     if debug:
         im1.show()
         im2.show()

@@ -3,6 +3,7 @@
 # An untested effort to tie everything together
 
 from picamera2 import Picamera2, Preview
+from picamera2.controls import Controls
 import time
 from time import sleep
 from PIL import Image
@@ -19,6 +20,7 @@ import cothread
 import logging
 
 trigcnt = 0
+capture = False
 
 def signal_handler(sig, frame):
     GPIO.cleanup()
@@ -26,7 +28,7 @@ def signal_handler(sig, frame):
 
 def exti_callback(channel):
     # When trigger arrives, increment triger count and request image capture
-    global trigcnt
+    global trigcnt, capture
     trigcnt += 1
     if not capture:
         capture = True
@@ -80,11 +82,19 @@ if __name__ == "__main__":
     print("Starting the camera.")
     cam_starting.set(1)
     picam2 = Picamera2()
+    picam2.start_preview(Preview.QTGL)
     camera_config = picam2.create_video_configuration()
     picam2.configure(camera_config)
     print("CAMERA CONFIGURATION:")
     print(camera_config)
     picam2.start()
+    
+    # Adjust exposure time
+    ctrls = Controls(picam2)
+    ctrls.AnalogueGain = 1.0
+    ctrls.ExposureTime = 10000 #microseconds
+    picam2.set_controls(ctrls)
+    
     cam_starting.set(0)
     cam_running.set(1)
 
@@ -134,15 +144,15 @@ if __name__ == "__main__":
                 print("Saving photo for trigger {}".format(trigcnt_im))
                 # Save photo
                 
-                #im.save('/home/pi/images/{}-photo.png'.format(trigcnt_im))
+                im.save('/home/pi/images/{}-photo.png'.format(trigcnt_im))
 
                 # Save graphic patched over with ROI rectangles
                 fig, ax = plt.subplots()
                 ax.imshow(imarr)
                 ax.add_patch(rect1)
                 ax.add_patch(rect2)
-                #fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt_im))
-                plt.show() # Hopefully, freezes image until we close it
+                fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt_im))
+                #plt.show() # Hopefully, freezes image until we close it
                 fig.clear()
             capture = False
         else:
