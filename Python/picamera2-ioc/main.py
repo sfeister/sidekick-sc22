@@ -33,7 +33,11 @@ def exti_callback(channel):
     trigcnt += 1
     if not capture:
         capture = True
-        
+
+def update_trigcnt(value):
+    global trigcnt
+    trigcnt = value
+
 def getbox(x, y, rad=50):
     """ Gets a matplotlib patch and a PIL-style crop box from x,y center coordinates and an optional half-diameter"""
     xycent = np.array([x, y])
@@ -57,7 +61,7 @@ if __name__ == "__main__":
 
     # Run contols
     cam_enable = builder.boolOut("ENABLE", ZNAM="false", ONAM="true")
-    cam_debug = builder.boolOut("DEBUG:ENABLE", ZNAM="false", ONAM="true")
+    cam_debug = builder.boolOut("DEBUG:ENABLE", ZNAM="false", ONAM="true", initial_value=0)
 
     # Run status
     cam_starting = builder.boolIn("STARTING", ZNAM="false", ONAM="true")
@@ -65,16 +69,18 @@ if __name__ == "__main__":
     cam_stopping = builder.boolIn("STOPPING", ZNAM="false", ONAM="true")
 
     cam_exposure = builder.longOut("EXPOSURE", initial_value=exp_us)
-    
+    cam_trigcnt = builder.longOut("TRIGCNT", initial_value=trigcnt, on_update=update_trigcnt)
+    # TODO: Add a callback that sets trigcnt on change!
+        
             # Format e.g. "TRIG:412302132,R:25,G:205,B:111"
     roi1_data = builder.stringIn("ROI1:DATA", initial_value="")
-    roi1_x = builder.longOut("ROI1:X", initial_value=310)
-    roi1_y = builder.longOut("ROI1:Y", initial_value=410)
+    roi1_x = builder.longOut("ROI1:X", initial_value=258)
+    roi1_y = builder.longOut("ROI1:Y", initial_value=419)
     roi1_rad = builder.longOut("ROI1:RAD", initial_value=10)
 
     roi2_data = builder.stringIn("ROI2:DATA", initial_value="")
-    roi2_x = builder.longOut("ROI2:X", initial_value=990)
-    roi2_y = builder.longOut("ROI2:Y", initial_value=390)
+    roi2_x = builder.longOut("ROI2:X", initial_value=1127)
+    roi2_y = builder.longOut("ROI2:Y", initial_value=445)
     roi2_rad = builder.longOut("ROI2:RAD", initial_value=10)
 
     # Boilerplate get the IOC started
@@ -115,11 +121,13 @@ if __name__ == "__main__":
     
     while True:                
         if capture:
+            cam_trigcnt.set(trigcnt)
+            
             ## CAPTURE A SINGLE IMAGE
             trigcnt_im = trigcnt
             im = picam2.capture_image("main")
             imarr = np.array(im)
-
+            
             # Hard code positions of rectangles here!
             #box1, rect1 = getbox(x=309, y=438, rad=10);
             #box2, rect2 = getbox(x=990, y=389, rad=10);
@@ -140,25 +148,28 @@ if __name__ == "__main__":
             avg2_u8 = np.round(avg2).astype(np.uint8)
             datastr2 = "TRIG:{},R:{},G:{},B:{}".format(trigcnt_im,avg2_u8[0],avg2_u8[1],avg2_u8[2])
             roi2_data.set(datastr2)
-            print(datastr1)
-            #print(datastr2)
+            print("ROI1: " + datastr1, "\t" + "ROI2: " + datastr2)
+
             
             if cam_debug.get():
                 print("Saving photo for trigger {}".format(trigcnt_im))
                 # Save photo
                 
-                im.save('/home/pi/images/{}-photo.png'.format(trigcnt_im))
-
+                #im.save('/home/pi/images/{}-photo.png'.format(trigcnt_im))
+                im.save('/home/pi/images/photo.png')
+                
                 # Save graphic patched over with ROI rectangles
                 fig, ax = plt.subplots()
                 ax.imshow(imarr)
                 ax.add_patch(rect1)
                 ax.add_patch(rect2)
-                fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt_im))
-                plt.draw() # Hopefully, doesn't crash
-                plt.pause(0.005)
+                #fig.savefig('/home/pi/images/{}-patched.png'.format(trigcnt_im))
+                fig.savefig('/home/pi/images/patched.png')
+                #plt.draw() # Hopefully, doesn't crash
+                #plt.pause(0.005)
                 fig.clear()
                 plt.close('all')
+                time.sleep(2)
     
             capture = False
         elif cam_exposure.get() != exp_us:

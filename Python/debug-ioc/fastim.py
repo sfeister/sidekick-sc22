@@ -35,8 +35,8 @@ if __name__ == "__main__":
     #imarr = picam2.capture_array("main")
 
     # Hard code positions of rectangles here!
-    box1, rect1 = getbox(x=446, y=366, rad=10);
-    box2, rect2 = getbox(x=957, y=397, rad=10);
+    box1, rect1 = getbox(x=299, y=387, rad=10);
+    box2, rect2 = getbox(x=1081, y=392, rad=10);
 
     im1 = im.crop(box=box1)
     im1_arr = np.array(im1)[:,:,:3] # Note, remove transparency channel here
