@@ -90,16 +90,17 @@ void myISR() {
       t0 = micros() + 1000; // Set "LED pulse time zero" to one thousand microseconds into the future to get everything set up first
 
       // Schedule the LED pulse starts and stops
-      for(int i = 0; i < (NLED-1); ++i)
+      for(int i = 0; i < (NLED - 1); ++i)
       {
           timer1.at(t0, LEDStart, i); // Set the start time for this LED
           timer1.at(t0 + durations[i], LEDStop, i); // Set the stop time for this LED (must be significantly after the start time)
       }
+      LEDStart(5); //starting last LED for constant on
     }
     String triggerMsg = "STREAM TRIG: " + String(trigCount) + ", ";
     // Serial.print("TRIG: " + String(trigCount) + ", ");
-    for (int i = 0; i < NLED; i++){
-      triggerMsg = triggerMsg + "L" + String(i) + ": " + String(brights[i]) + ", ");
+    for (int i = 0; i < NLED - 1; i++){
+      triggerMsg = (triggerMsg + "L" + String(i) + ": " + String(brights[i]) + ", ");
     }    
     Serial.println(triggerMsg);
     
@@ -107,7 +108,7 @@ void myISR() {
 
 /* Serial communication functions */
 void identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,20221109"));
+  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,20221114"));
 }
 
 void getBrightness(SCPI_C commands, SCPI_P parameters, Stream& interface) {
@@ -288,7 +289,7 @@ void setup() {
   durations[2] = 500000;
   durations[3] = 500000;
   durations[4] = 500000;
-  durations[5] = 100000000; //last Neopixel should have very long duration so it always stays on
+  durations[5] = 500000; //last Neopixel should have very long duration so it always stays on
 
   // Set intial LED brightnesses
   brights[0] = 200;
@@ -308,10 +309,12 @@ void setup() {
 
   // Begin accepting SCPI commands
   Serial.begin(115200);
+  //Serial.println("Hello, world!");
+  //LEDStart(5); //starting last LED for constant on
 }
 
 void loop() {
   timer1.tick();
-  LEDStart(NLED-1);
+  //LEDStart(NLED-1);
   my_instrument.ProcessInput(Serial, "\r\n");
 } 
