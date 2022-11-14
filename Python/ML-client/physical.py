@@ -2,7 +2,8 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": 69,
+   "id": "84e94be2",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -21,7 +22,8 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": 55,
+   "id": "58a232c1",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -92,7 +94,8 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 3,
+   "execution_count": 56,
+   "id": "eaedbff6",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -115,7 +118,8 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 4,
+   "execution_count": 57,
+   "id": "700beeb3",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -154,7 +158,8 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
+   "execution_count": 66,
+   "id": "4f2bf337",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -340,13 +345,14 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
+   "execution_count": 67,
+   "id": "f89cb594",
    "metadata": {},
    "outputs": [
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "7d639e7a40484a72be226a6e356ec79e",
+       "model_id": "4bffbd48346b4bf2902267b24643de65",
        "version_major": 2,
        "version_minor": 0
       },
@@ -356,6 +362,58 @@
      },
      "metadata": {},
      "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.002648\n",
+      "         Iterations: 10\n",
+      "         Function evaluations: 69\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/Users/bremer5/opt/anaconda3/lib/python3.7/site-packages/sklearn/ensemble/forest.py:245: FutureWarning: The default value of n_estimators will change from 10 in version 0.20 to 100 in 0.22.\n",
+      "  \"10 in version 0.20 to 100 in 0.22.\", FutureWarning)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000046\n",
+      "         Iterations: 11\n",
+      "         Function evaluations: 71\n",
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000121\n",
+      "         Iterations: 11\n",
+      "         Function evaluations: 71\n",
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000059\n",
+      "         Iterations: 12\n",
+      "         Function evaluations: 73\n",
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000025\n",
+      "         Iterations: 17\n",
+      "         Function evaluations: 75\n",
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000051\n",
+      "         Iterations: 12\n",
+      "         Function evaluations: 67\n",
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000025\n",
+      "         Iterations: 17\n",
+      "         Function evaluations: 74\n",
+      "Optimization terminated successfully.\n",
+      "         Current function value: 0.000013\n",
+      "         Iterations: 13\n",
+      "         Function evaluations: 74\n"
+     ]
     }
    ],
    "source": [
@@ -408,6 +466,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
+   "id": "4badf244",
    "metadata": {},
    "outputs": [],
    "source": []
@@ -415,6 +474,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
+   "id": "3e746b4c",
    "metadata": {},
    "outputs": [],
    "source": []
@@ -436,7 +496,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.5"
+   "version": "3.9.6"
   }
  },
  "nbformat": 4,
