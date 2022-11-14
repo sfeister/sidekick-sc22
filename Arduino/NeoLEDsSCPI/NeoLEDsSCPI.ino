@@ -97,10 +97,9 @@ void myISR() {
       }
       LEDStart(5); //starting last LED for constant on
     }
-    String triggerMsg = "STREAM TRIG: " + String(trigCount) + ", ";
-    // Serial.print("TRIG: " + String(trigCount) + ", ");
+    String triggerMsg = "STREAM " + String(trigCount) + ",";
     for (int i = 0; i < NLED - 1; i++){
-      triggerMsg = (triggerMsg + "L" + String(i) + ": " + String(brights[i]) + ", ");
+      triggerMsg = (triggerMsg + String(brights[i]) + ",");
     }    
     Serial.println(triggerMsg);
     
