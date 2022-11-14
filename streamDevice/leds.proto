@@ -9,6 +9,11 @@ info {
 	in "%39c";
 }
 
+data {
+	ExtraInput = Ignore;
+	in "STREAM %39c";
+}
+
 # Brightness is an integer, 0 to 255
 # Use long integer record type
 getBrightness {
@@ -33,6 +38,39 @@ setDuration {
         out "DURation:LED\$1 %u";
         @init { getDuration; }
     }
+	
+# red
+getRed {
+		out "RED:LED\$1?";
+		in "%f";
+	}
+
+setRed {
+		out "RED:LED\$1 %f";
+		@init { getRed; }
+	}
+	
+# green
+getGreen {
+		out "GREEN:LED\$1?";
+		in "%f";
+	}
+
+setGreen {
+		out "GREEN:LED\$1 %f";
+		@init { getGreen; }
+	}
+
+# blue
+getBlue {
+		out "BLUE:LED\$1?";
+		in "%f";
+	}
+
+setBlue {
+		out "BLUE:LED\$1 %f";
+		@init { getBlue; }
+	}
     
 debug {
    ExtraInput = Ignore;

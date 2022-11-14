@@ -5,6 +5,13 @@ record(stringin,"LEDS:info"){
     field(PINI, "YES")
 }
 
+record(stringin,"LEDS:data"){
+	field (DESC, "Get trigger and LED data")
+	field (DTYP, "stream")
+	field (SCAN, "I/O Intr")
+	field (INP, "@leds.proto data leds_ino")
+	field(PINI, "YES")
+}
 
 # Channel 0
 record(longout,"LEDS:CH0:brig"){
@@ -24,6 +31,29 @@ record(int64out,"LEDS:CH0:dur"){
 	field(OUT,"@leds.proto setDuration(0) led_ino")
 }
 
+record(ao,"LEDS:CH0:red"){
+    field (DESC, "Set LED red value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setRed(0) led_ino")
+}
+
+record(ao,"LEDS:CH0:green"){
+    field (DESC, "Set LED green value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setGreen(0) led_ino")
+}
+
+record(ao,"LEDS:CH0:blue"){
+    field (DESC, "Set LED blue value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setBlue(0) led_ino")
+}
 
 # Channel 1
 record(longout,"LEDS:CH1:brig"){
@@ -43,6 +73,29 @@ record(int64out,"LEDS:CH1:dur"){
 	field(OUT,"@leds.proto setDuration(1) led_ino")
 }
 
+record(ao,"LEDS:CH1:red"){
+    field (DESC, "Set LED red value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setRed(1) led_ino")
+}
+
+record(ao,"LEDS:CH1:green"){
+    field (DESC, "Set LED green value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setGreen(1) led_ino")
+}
+
+record(ao,"LEDS:CH1:blue"){
+    field (DESC, "Set LED blue value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setBlue(1) led_ino")
+}
 
 
 # Channel 2
@@ -63,6 +116,29 @@ record(int64out,"LEDS:CH2:dur"){
 	field(OUT,"@leds.proto setDuration(2) led_ino")
 }
 
+record(ao,"LEDS:CH2:red"){
+    field (DESC, "Set LED red value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setRed(2) led_ino")
+}
+
+record(ao,"LEDS:CH2:green"){
+    field (DESC, "Set LED green value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setGreen(2) led_ino")
+}
+
+record(ao,"LEDS:CH2:blue"){
+    field (DESC, "Set LED blue value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setBlue(2) led_ino")
+}
 
 # Channel 3
 record(longout,"LEDS:CH3:brig"){
@@ -82,9 +158,29 @@ record(int64out,"LEDS:CH3:dur"){
 	field(OUT,"@leds.proto setDuration(3) led_ino")
 }
 
+record(ao,"LEDS:CH3:red"){
+    field (DESC, "Set LED red value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setRed(3) led_ino")
+}
 
+record(ao,"LEDS:CH3:green"){
+    field (DESC, "Set LED green value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setGreen(3) led_ino")
+}
 
-
+record(ao,"LEDS:CH3:blue"){
+    field (DESC, "Set LED blue value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setBlue(3) led_ino")
+}
 
 # Channel 4
 record(longout,"LEDS:CH4:brig"){
@@ -102,6 +198,72 @@ record(int64out,"LEDS:CH4:dur"){
 	field(DRVH,"10000000") # restrict users from setting overly high times
 	field(EGU,"micros")
 	field(OUT,"@leds.proto setDuration(4) led_ino")
+}
+
+record(ao,"LEDS:CH4:red"){
+    field (DESC, "Set LED red value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setRed(4) led_ino")
+}
+
+record(ao,"LEDS:CH4:green"){
+    field (DESC, "Set LED green value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setGreen(4) led_ino")
+}
+
+record(ao,"LEDS:CH4:blue"){
+    field (DESC, "Set LED blue value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setBlue(4) led_ino")
+}
+
+# Channel 5
+record(longout,"LEDS:CH5:brig"){
+    field (DESC, "Set LED brightness")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"255")  
+	field(OUT,"@leds.proto setBrightness(5) led_ino")
+}
+
+record(int64out,"LEDS:CH5:dur"){
+    field(DESC, "Set LED duration (output)")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"10000000") # restrict users from setting overly high times
+	field(EGU,"micros")
+	field(OUT,"@leds.proto setDuration(5) led_ino")
+}
+
+record(ao,"LEDS:CH5:red"){
+    field (DESC, "Set LED red value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setRed(5) led_ino")
+}
+
+record(ao,"LEDS:CH5:green"){
+    field (DESC, "Set LED green value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setGreen(5) led_ino")
+}
+
+record(ao,"LEDS:CH5:blue"){
+    field (DESC, "Set LED blue value")
+	field(DTYP,"stream")
+	field(DRVL,"0")
+	field(DRVH,"1")  
+	field(OUT,"@leds.proto setBlue(5) led_ino")
 }
 
 record(stringin,"LEDS:debug"){
