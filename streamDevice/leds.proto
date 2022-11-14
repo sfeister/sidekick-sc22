@@ -41,36 +41,36 @@ setDuration {
 	
 # red
 getRed {
-		out "RED:LED\$1?";
-		in "%f";
-	}
+	out "RED:LED\$1?";
+	in "%f";
+    }
 
 setRed {
-		out "RED:LED\$1 %f";
-		@init { getRed; }
-	}
+	out "RED:LED\$1 %f";
+	@init { getRed; }
+    }
 	
 # green
 getGreen {
-		out "GREEN:LED\$1?";
-		in "%f";
-	}
+	out "GREEN:LED\$1?";
+	in "%f";
+    }
 
 setGreen {
-		out "GREEN:LED\$1 %f";
-		@init { getGreen; }
-	}
+	out "GREEN:LED\$1 %f";
+	@init { getGreen; }
+    }
 
 # blue
 getBlue {
-		out "BLUE:LED\$1?";
-		in "%f";
-	}
+	out "BLUE:LED\$1?";
+	in "%f";
+    }
 
 setBlue {
-		out "BLUE:LED\$1 %f";
-		@init { getBlue; }
-	}
+	out "BLUE:LED\$1 %f";
+	@init { getBlue; }
+    }
     
 debug {
    ExtraInput = Ignore;

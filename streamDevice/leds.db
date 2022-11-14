@@ -9,7 +9,7 @@ record(stringin,"LEDS:data"){
 	field (DESC, "Get trigger and LED data")
 	field (DTYP, "stream")
 	field (SCAN, "I/O Intr")
-	field (INP, "@leds.proto data leds_ino")
+	field (INP, "@leds.proto data led_ino")
 	field(PINI, "YES")
 }
 
