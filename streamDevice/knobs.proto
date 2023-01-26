@@ -2,6 +2,7 @@
 # Built by examining examples at: https://paulscherrerinstitute.github.io/StreamDevice/protocol.html#gen
 
 Terminator = CR LF;
+PollPeriod = 50; # ensures 50 ms between checking for unsolicited data; reduces latency between knob adjustment and EPICS update
 
 info {
 	ExtraInput = Ignore;
