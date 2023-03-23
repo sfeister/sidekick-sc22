@@ -2,6 +2,7 @@ record(stringin,"PULSEGEN:info"){
     field (DESC, "Get information about the Pulse Generator device")
 	field(DTYP,"stream")
 	field(INP,"@pulsegen.proto info pulsegen_ino")
+    field(SCAN, "10 second")
     field(PINI, "YES")
 }
 
