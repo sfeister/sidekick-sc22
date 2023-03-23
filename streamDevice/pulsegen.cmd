@@ -5,7 +5,7 @@ streamApp_registerRecordDeviceDriver
 
 epicsEnvSet "STREAM_PROTOCOL_PATH","."
 
-drvAsynSerialPortConfigure("pulsegen_ino","/dev/ttyUSB1")
+drvAsynSerialPortConfigure("pulsegen_ino","/dev/ttyUSB-arduino1.1")
 asynSetOption("pulsegen_ino",0,"baud","115200")
 asynSetOption("pulsegen_ino",0,"bits","8")
 asynSetOption("pulsegen_ino",0,"parity","none")
