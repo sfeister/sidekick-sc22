@@ -57,7 +57,7 @@ if __name__ == "__main__":
     builder.SetDeviceName("CAM")
 
     ## Create some records
-    cam_info = builder.stringIn("INFO", initial_value="DolphinDAQ,PiCamera2,#00,20230125")
+    cam_info = builder.stringIn("INFO", initial_value="DolphinDAQ,PiCamera2,#00,20230323")
 
     # Run contols
     cam_enable = builder.boolOut("ENABLE", ZNAM="false", ONAM="true")
@@ -70,12 +70,11 @@ if __name__ == "__main__":
 
     cam_exposure = builder.longOut("EXPOSURE", initial_value=exp_us)
     cam_trigcnt = builder.longOut("TRIGCNT", initial_value=trigcnt, on_update=update_trigcnt)
-    # TODO: Add a callback that sets trigcnt on change!
         
     # Format e.g. "TRIG:412302132,R:25,G:205,B:111"
     roi1_data = builder.stringIn("ROI1:DATA", initial_value="")
-    roi1_x = builder.longOut("ROI1:X", initial_value=258)
-    roi1_y = builder.longOut("ROI1:Y", initial_value=419)
+    roi1_x = builder.longOut("ROI1:X", initial_value=128)
+    roi1_y = builder.longOut("ROI1:Y", initial_value=298)
     roi1_rad = builder.longOut("ROI1:RAD", initial_value=10)
     roi1_bg_r = builder.longOut("ROI1:BG:red", initial_value=0)
     roi1_bg_g = builder.longOut("ROI1:BG:green", initial_value=0)
@@ -83,8 +82,8 @@ if __name__ == "__main__":
             
     
     roi2_data = builder.stringIn("ROI2:DATA", initial_value="")
-    roi2_x = builder.longOut("ROI2:X", initial_value=1127)
-    roi2_y = builder.longOut("ROI2:Y", initial_value=445)
+    roi2_x = builder.longOut("ROI2:X", initial_value=1131)
+    roi2_y = builder.longOut("ROI2:Y", initial_value=298)
     roi2_rad = builder.longOut("ROI2:RAD", initial_value=10)
     roi2_bg_r = builder.longOut("ROI2:BG:red", initial_value=0)
     roi2_bg_g = builder.longOut("ROI2:BG:green", initial_value=0)
