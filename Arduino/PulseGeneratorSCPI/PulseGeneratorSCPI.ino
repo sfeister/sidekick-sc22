@@ -4,16 +4,16 @@ PulseGeneratorSCPI.ino
 Generates 3.3 V TTL square pulses at a specified repetition rate.
 
 Important Notes:
- * Creates eight independently delayed TTL pulses. Each channel's delay time is specified in microseconds relative to TRIGOUT.
+ * Creates eight independently delayed TTL pulses. Each channel's delay time is specified in milliseconds relative to TRIGOUT.
  * Each TTL pulse is emitted as HIGH (3.3 V) with a 3 millisecond duration, after which is goes back to its LOW state (0 V).
- * The overall repetition rate of the system can be adjusted up to about 100 Hz (depending on other time delay choices).
- * Typical precision of the requested delay times (on an Arduino Uno) is about 50 microseconds. This jitters around.
+ * The overall repetition rate of the system can be adjusted up to about 20 Hz (depending on other time delay choices).
+ * Typical precision of the requested delay times (on an Arduino Uno) should be a millisecond. Timing jitters around about a millisecond.
  * "Time-zero" trigger output can be monitored on Arduino Pin 3.
  * Up to eight channels (CH0 - CH7) of controlled TTL pulse outputs can be wired to Arduino Pins 4, 5, 6, 7, 8, 9, 10, 11.
 
 Serial Commands (lower-case portions are optional):
   *IDN?                 Responds with a device identification string.
-  DELay:CHannelN VAL    Sets Channel N (0-7) output delay to VAL (unsigned long integer, in microseconds).
+  DELay:CHannelN VAL    Sets Channel N (0-7) output delay to VAL (unsigned long integer, in milliseconds).
   DELay:CHannelN?       Responds with output delay (unsigned long integer, in microseconds) of Channel N (0-7).
   REPrate VAL           Sets system-wide repetition-rate to VAL (double, in Hz).
   REPrate?              Responds with the system-wide repetition-rate (double, in Hz).
@@ -22,7 +22,7 @@ References:
  1. Following timer instructions at: https://github.com/contrem/arduino-timer
  2. Following Vrekrer SCPI Parser examples, e.g. at https://github.com/Vrekrer/Vrekrer_scpi_parser/blob/master/examples/Numeric_suffixes/Numeric_suffixes.ino
 
-Created by Scott Feister, Emiko Ito, and Keily Valdez-Sereno of California State University Channel Islands in Fall 2021.
+Created by Scott Feister, Emiko Ito, and Keily Valdez-Sereno of California State University Channel Islands in Fall 2021. Updated for millisecond delays in March 2023.
 */
 
 #include "Arduino.h"
@@ -45,14 +45,14 @@ Created by Scott Feister, Emiko Ito, and Keily Valdez-Sereno of California State
 SCPI_Parser my_instrument;
 
 /* Timing initialization */
-Timer<10, micros, int> timer1; // TTL pulse timer with 10 task slots, microsecond resolution, and handler argument type int
+Timer<10, millis, int> timer1; // TTL pulse timer with 10 task slots, millisecond resolution, and handler argument type int
 Timer<1, millis> timer2; // rep-rate timer with 1 task slot, millisecond resolution, and void-type handler
 
 int chanPins[NCHAN]; // Pins for each channel
 unsigned long delays[NCHAN]; // Millisecond delay times for each channel
 
-int pulseTime = 3000; // TTL pulse duration in microseconds
-double repRate = 0.5; // pulse repetition-rate in Hz
+int pulseTime = 3; // TTL pulse duration in milliseconds
+double repRate = 1.0; // pulse repetition-rate in Hz
 unsigned long t0;
 
 /* Timing functions */
@@ -71,7 +71,7 @@ bool TTLStart(int chanPin) {
 
 bool trigStart(void *argument){
     if (timer1.size() < 1) { // Only start a new set of triggers if the old set is completed
-      t0 = micros() + 1000; // Set "time zero" two thousand microseconds into the future to get everything set up first
+      t0 = millis() + 2; // Set "time zero" two milliseconds into the future to get everything set up first
 
       // Schedule the "TRIGOUT" / t0 pulse
       timer1.at(t0, TTLStart, TRIGOUT);
@@ -95,7 +95,7 @@ void updateRepRate(double repRateHz){
 
 /* Serial communication functions */
 void identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  interface.println(F("DolphinDAQ,SC22 PulseGen,#00,20221109"));
+  interface.println(F("DolphinDAQ,SC22 PulseGen,#00,20230323"));
 }
 
 
@@ -171,15 +171,15 @@ void setup() {
   chanPins[6] = CH6;
   chanPins[7] = CH7;
     
-  // Save initial delay times (in microseconds) into the delays array
-  delays[0] = 2000;
-  delays[1] = 2000;
-  delays[2] = 2000;
-  delays[3] = 2000;
-  delays[4] = 2000;
-  delays[5] = 2000;
-  delays[6] = 2000;
-  delays[7] = 2000;
+  // Save initial delay times (in milliseconds) into the delays array
+  delays[0] = 0;
+  delays[1] = 0;
+  delays[2] = 0;
+  delays[3] = 0;
+  delays[4] = 0;
+  delays[5] = 0;
+  delays[6] = 0;
+  delays[7] = 0;
 
   // Initialize the repetition rate
   updateRepRate(repRate); // Sets the repetition-rate, with value in Hz

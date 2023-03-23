@@ -6,14 +6,14 @@ When externally triggered, flashes six LEDs a single time. Each LED has its own 
 Built directly off of LEDsSCPI.ino from the Sidekick system. Adapted for use with Adafruit Neopixels.
 
 Important Notes:
- * LED flash begins abbout 1000 microseconds after the external trigger is received.
+ * LED flash begins abbout 5 milliseconds after the external trigger is received.
  * External trigger should be wired to Arduino Pin 2.
  * The Neopixel data pin should be wired to Arduino Pin 3.
  
 Serial Commands (lower-case portions are optional):
   *IDN?                 Responds with a device identification string.
-  DURation:LEDN VAL     Sets LED N (0-5) pulse duration to VAL (unsigned long integer, in microseconds).
-  DURation:LEDN?        Responds with LED N (0-5) pulse duration (unsigned long integer, in microseconds).
+  DURation:LEDN VAL     Sets LED N (0-5) pulse duration to VAL (unsigned long integer, in milliseconds).
+  DURation:LEDN?        Responds with LED N (0-5) pulse duration (unsigned long integer, in milliseconds).
   BRIGhtness:LEDN VAL   Sets LED N (0-5) brightness (PWM duty cycle) to VAL (integer, 0 to 255).
   BRIGhtness:LEDN?      Responds with LED N (0-5) brightness (PWM duty cycle)(integer, 0 to 255).
   RED:LEDN VAL          Sets LED N (0-5) to a Red VAL (0-1)
@@ -28,7 +28,7 @@ References:
  2. Following Vrekrer SCPI Parser examples, e.g. at https://github.com/Vrekrer/Vrekrer_scpi_parser/blob/master/examples/Numeric_suffixes/Numeric_suffixes.ino
  3. Attaching an interrupt pin for external triggering: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/ 
 
-Created by Emiko Ito, Keily Valdez-Sereno, and Scott Feister of California State University Channel Islands between 2021 - 2022.
+Created by Emiko Ito, Keily Valdez-Sereno, and Scott Feister of California State University Channel Islands between 2021 - 2022. Updated for miliseconds in March 2023.
 */
 
 #include "Arduino.h" 
@@ -48,14 +48,14 @@ Created by Emiko Ito, Keily Valdez-Sereno, and Scott Feister of California State
 Adafruit_NeoPixel pixels(NLED, LED0, NEO_RGBW + NEO_KHZ800);
 
 
-Timer<16, micros, int> timer1; // Timer with 16 task slots, microsecond resolution, and handler argument type int
+Timer<16, millis, int> timer1; // Timer with 16 task slots, millisecond resolution, and handler argument type int
 
 //int LEDPins[NLED]; // Arduino pin numbers for each of the six LED outputs
 int brights[NLED]; // Brightnesses for each of the six LEDs, when on
 float red[NLED] =   {1, 0, 0, 1, 0, 0.75}; //red values for each pixel
 float green[NLED] = {0, 1, 0, 0, 1, 0.25}; //green values for each pixel
 float blue[NLED] =  {0, 0, 1, 1, 1, 0.50}; //blue values for each pixel
-unsigned long durations[NLED]; // Pulse duration times, in microseconds, for each of the six LEDs
+unsigned long durations[NLED]; // Pulse duration times, in milliseconds, for each of the six LEDs
 unsigned long t0;
 int trigCount = 0;
 
@@ -87,18 +87,17 @@ void myISR() {
     // Pulse the LEDs once, each with its own brightness and duration
     trigCount++;
     if (timer1.size() < 1) { // Only start a new set of LED pulses if the old set is completed
-      t0 = micros() + 1000; // Set "LED pulse time zero" to one thousand microseconds into the future to get everything set up first
+      t0 = millis() + 5; // Set "LED pulse time zero" to five milliseconds into the future to get everything set up first
 
       // Schedule the LED pulse starts and stops
-      for(int i = 0; i < (NLED - 1); ++i)
+      for(int i = 0; i < (NLED); ++i)
       {
           timer1.at(t0, LEDStart, i); // Set the start time for this LED
           timer1.at(t0 + durations[i], LEDStop, i); // Set the stop time for this LED (must be significantly after the start time)
       }
-      LEDStart(5); //starting last LED for constant on
     }
     String triggerMsg = "STREAM " + String(trigCount) + ",";
-    for (int i = 0; i < NLED - 1; i++){
+    for (int i = 0; i < NLED; i++){
       triggerMsg = (triggerMsg + String(brights[i]) + ",");
     }    
     Serial.println(triggerMsg);
@@ -107,7 +106,7 @@ void myISR() {
 
 /* Serial communication functions */
 void identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,20221114"));
+  interface.println(F("DolphinDAQ,SC22 Neo-LEDs,#00,20230323"));
 }
 
 void getBrightness(SCPI_C commands, SCPI_P parameters, Stream& interface) {
@@ -282,13 +281,13 @@ void setup() {
   my_instrument.RegisterCommand(F("LED#?"), &getBlue);
   my_instrument.RegisterCommand(F("LED#"), &setBlue);
   
-  // Set initial LED pulse durations (in microseconds)
-  durations[0] = 500000;
-  durations[1] = 500000;
-  durations[2] = 500000;
-  durations[3] = 500000;
-  durations[4] = 500000;
-  durations[5] = 500000; //last Neopixel should have very long duration so it always stays on
+  // Set initial LED pulse durations (in miliseconds)
+  durations[0] = 500;
+  durations[1] = 500;
+  durations[2] = 500;
+  durations[3] = 500;
+  durations[4] = 500;
+  durations[5] = 500;
 
   // Set intial LED brightnesses
   brights[0] = 200;
@@ -296,7 +295,7 @@ void setup() {
   brights[2] = 200;
   brights[3] = 200;
   brights[4] = 200;
-  brights[5] = 200; //last Neopixel remains bright
+  brights[5] = 200;
 
   // Set up external triggering
   attachInterrupt(digitalPinToInterrupt(EXTTRIG), myISR, RISING);
@@ -308,12 +307,9 @@ void setup() {
 
   // Begin accepting SCPI commands
   Serial.begin(115200);
-  //Serial.println("Hello, world!");
-  //LEDStart(5); //starting last LED for constant on
 }
 
 void loop() {
   timer1.tick();
-  //LEDStart(NLED-1);
   my_instrument.ProcessInput(Serial, "\r\n");
 } 
