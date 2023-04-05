@@ -14,7 +14,7 @@ Important Notes:
 Serial Commands (lower-case portions are optional):
   *IDN?                 Responds with a device identification string.
   DELay:CHannelN VAL    Sets Channel N (0-7) output delay to VAL (unsigned long integer, in milliseconds).
-  DELay:CHannelN?       Responds with output delay (unsigned long integer, in microseconds) of Channel N (0-7).
+  DELay:CHannelN?       Responds with output delay (unsigned long integer, in milliseconds) of Channel N (0-7).
   REPrate VAL           Sets system-wide repetition-rate to VAL (double, in Hz).
   REPrate?              Responds with the system-wide repetition-rate (double, in Hz).
 
@@ -95,7 +95,7 @@ void updateRepRate(double repRateHz){
 
 /* Serial communication functions */
 void identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  interface.println(F("DolphinDAQ,SC22 PulseGen,#00,20230323"));
+  interface.println(F("DolphinDAQ,SC22 PulseGen,#00,20230405"));
 }
 
 
